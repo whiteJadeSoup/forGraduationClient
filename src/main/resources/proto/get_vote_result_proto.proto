@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+
+option java_package = "com.test.proto";
+
+
+message GetVoteResultRequest {
+	string selectionId = 1;
+	int32 voteId = 2;
+	 
+}
+
+
+
+// statusCode :
+//   0 - 成功
+//   5 - 其他错误
+message GetVoteResultResponse {
+	int32 voteId = 1;
+	int32 statusCode = 2;
+	int32 voteResult = 3;
+	
+	
+	string extra = 4;
+	string selectionId = 5;
+}

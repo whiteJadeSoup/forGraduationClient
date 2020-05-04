@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+
+option java_package = "com.test.proto";
+
+
+message GoVoteRequest {
+	 int32 voteId = 1;
+
+	 
+	 bytes x = 2;
+	 bytes y = 3;
+	 
+	 
+	 bytes w = 4;
+	 bytes a1 = 5;
+	 bytes b1 = 6;
+	 bytes a2 = 7;
+	 bytes b2 = 8;
+	 bytes d1 = 9;
+	 bytes d2 = 10;
+	 bytes r1 = 11;
+	 bytes r2 = 12;
+	 
+	 
+	 string selectionId = 13;
+	 
+	 
+}
+
+
+
+// statusCode :
+//   0 - 投票成功
+//   1 - 当前选举id重复投票
+//   2 - 零知识证明失败
+//   3 - 其他错误
+message GoVoteResponse {
+	int32 voteId = 1;
+	
+	int32 statusCode = 2;
+	
+	string selectionId = 3;
+	
+	string extra = 4;
+
+}

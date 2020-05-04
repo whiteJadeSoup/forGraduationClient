@@ -1,0 +1,23 @@
+
+
+syntax = "proto3";
+
+
+option java_package = "com.test.proto";
+
+
+message CalCommonKeyRequest {
+	 int32 voteId = 1;
+}
+
+
+
+// statusCode:
+//  0 - 正常
+
+message CalCommonKeyResponse {
+	 int32 voteId = 1;
+	 
+	 int32 statusCode = 2;
+	 bytes commonKey = 3;
+}

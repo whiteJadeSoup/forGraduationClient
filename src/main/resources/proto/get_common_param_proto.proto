@@ -1,0 +1,22 @@
+
+
+syntax = "proto3";
+
+
+option java_package = "com.test.proto";
+
+
+message GetCommonParamRequest {
+	 int32 voteId = 1;
+}
+
+
+
+//1  状态码
+//2  g1生成元
+//3  选举id
+message GetCommonParamResponse {
+	 int32 statusCode = 1;
+	 bytes generatorG1 = 2;
+	 bytes selectionId = 3;
+}

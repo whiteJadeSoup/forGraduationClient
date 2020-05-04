@@ -1,0 +1,30 @@
+
+
+syntax = "proto3";
+
+
+option java_package = "com.test.proto";
+
+
+message BoardcastPublicKeyRequest {
+	 int32 voteId = 1;
+	 bytes publickey = 2;
+	 
+	 bytes gq = 3;
+	 bytes r = 4;
+	 
+}
+
+
+
+
+// statusCode:  
+//     0 - 正常
+//     1 - 重复传播了
+//     2 - 算法失败
+//     3 - 零知识证明无法通过
+message BoardcastPublicKeyResponse {
+	 int32 voteId = 1;
+	 int32 statusCode = 2;
+}
+
