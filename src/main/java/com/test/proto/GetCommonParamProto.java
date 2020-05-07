@@ -521,6 +521,30 @@ public final class GetCommonParamProto {
      * @return The selectionId.
      */
     com.google.protobuf.ByteString getSelectionId();
+
+    /**
+     * <code>string deadLine = 4;</code>
+     * @return The deadLine.
+     */
+    java.lang.String getDeadLine();
+    /**
+     * <code>string deadLine = 4;</code>
+     * @return The bytes for deadLine.
+     */
+    com.google.protobuf.ByteString
+        getDeadLineBytes();
+
+    /**
+     * <code>string extra = 5;</code>
+     * @return The extra.
+     */
+    java.lang.String getExtra();
+    /**
+     * <code>string extra = 5;</code>
+     * @return The bytes for extra.
+     */
+    com.google.protobuf.ByteString
+        getExtraBytes();
   }
   /**
    * <pre>
@@ -543,6 +567,8 @@ public final class GetCommonParamProto {
     private GetCommonParamResponse() {
       generatorG1_ = com.google.protobuf.ByteString.EMPTY;
       selectionId_ = com.google.protobuf.ByteString.EMPTY;
+      deadLine_ = "";
+      extra_ = "";
     }
 
     @java.lang.Override
@@ -588,6 +614,18 @@ public final class GetCommonParamProto {
             case 26: {
 
               selectionId_ = input.readBytes();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              deadLine_ = s;
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              extra_ = s;
               break;
             }
             default: {
@@ -652,6 +690,78 @@ public final class GetCommonParamProto {
       return selectionId_;
     }
 
+    public static final int DEADLINE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object deadLine_;
+    /**
+     * <code>string deadLine = 4;</code>
+     * @return The deadLine.
+     */
+    public java.lang.String getDeadLine() {
+      java.lang.Object ref = deadLine_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deadLine_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string deadLine = 4;</code>
+     * @return The bytes for deadLine.
+     */
+    public com.google.protobuf.ByteString
+        getDeadLineBytes() {
+      java.lang.Object ref = deadLine_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deadLine_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int EXTRA_FIELD_NUMBER = 5;
+    private volatile java.lang.Object extra_;
+    /**
+     * <code>string extra = 5;</code>
+     * @return The extra.
+     */
+    public java.lang.String getExtra() {
+      java.lang.Object ref = extra_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        extra_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string extra = 5;</code>
+     * @return The bytes for extra.
+     */
+    public com.google.protobuf.ByteString
+        getExtraBytes() {
+      java.lang.Object ref = extra_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        extra_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -675,6 +785,12 @@ public final class GetCommonParamProto {
       if (!selectionId_.isEmpty()) {
         output.writeBytes(3, selectionId_);
       }
+      if (!getDeadLineBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, deadLine_);
+      }
+      if (!getExtraBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, extra_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -695,6 +811,12 @@ public final class GetCommonParamProto {
       if (!selectionId_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, selectionId_);
+      }
+      if (!getDeadLineBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, deadLine_);
+      }
+      if (!getExtraBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, extra_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -717,6 +839,10 @@ public final class GetCommonParamProto {
           .equals(other.getGeneratorG1())) return false;
       if (!getSelectionId()
           .equals(other.getSelectionId())) return false;
+      if (!getDeadLine()
+          .equals(other.getDeadLine())) return false;
+      if (!getExtra()
+          .equals(other.getExtra())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -734,6 +860,10 @@ public final class GetCommonParamProto {
       hash = (53 * hash) + getGeneratorG1().hashCode();
       hash = (37 * hash) + SELECTIONID_FIELD_NUMBER;
       hash = (53 * hash) + getSelectionId().hashCode();
+      hash = (37 * hash) + DEADLINE_FIELD_NUMBER;
+      hash = (53 * hash) + getDeadLine().hashCode();
+      hash = (37 * hash) + EXTRA_FIELD_NUMBER;
+      hash = (53 * hash) + getExtra().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -879,6 +1009,10 @@ public final class GetCommonParamProto {
 
         selectionId_ = com.google.protobuf.ByteString.EMPTY;
 
+        deadLine_ = "";
+
+        extra_ = "";
+
         return this;
       }
 
@@ -908,6 +1042,8 @@ public final class GetCommonParamProto {
         result.statusCode_ = statusCode_;
         result.generatorG1_ = generatorG1_;
         result.selectionId_ = selectionId_;
+        result.deadLine_ = deadLine_;
+        result.extra_ = extra_;
         onBuilt();
         return result;
       }
@@ -964,6 +1100,14 @@ public final class GetCommonParamProto {
         }
         if (other.getSelectionId() != com.google.protobuf.ByteString.EMPTY) {
           setSelectionId(other.getSelectionId());
+        }
+        if (!other.getDeadLine().isEmpty()) {
+          deadLine_ = other.deadLine_;
+          onChanged();
+        }
+        if (!other.getExtra().isEmpty()) {
+          extra_ = other.extra_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1089,6 +1233,158 @@ public final class GetCommonParamProto {
         onChanged();
         return this;
       }
+
+      private java.lang.Object deadLine_ = "";
+      /**
+       * <code>string deadLine = 4;</code>
+       * @return The deadLine.
+       */
+      public java.lang.String getDeadLine() {
+        java.lang.Object ref = deadLine_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deadLine_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string deadLine = 4;</code>
+       * @return The bytes for deadLine.
+       */
+      public com.google.protobuf.ByteString
+          getDeadLineBytes() {
+        java.lang.Object ref = deadLine_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deadLine_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string deadLine = 4;</code>
+       * @param value The deadLine to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDeadLine(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        deadLine_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string deadLine = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDeadLine() {
+        
+        deadLine_ = getDefaultInstance().getDeadLine();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string deadLine = 4;</code>
+       * @param value The bytes for deadLine to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDeadLineBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        deadLine_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object extra_ = "";
+      /**
+       * <code>string extra = 5;</code>
+       * @return The extra.
+       */
+      public java.lang.String getExtra() {
+        java.lang.Object ref = extra_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          extra_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string extra = 5;</code>
+       * @return The bytes for extra.
+       */
+      public com.google.protobuf.ByteString
+          getExtraBytes() {
+        java.lang.Object ref = extra_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          extra_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string extra = 5;</code>
+       * @param value The extra to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExtra(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        extra_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string extra = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearExtra() {
+        
+        extra_ = getDefaultInstance().getExtra();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string extra = 5;</code>
+       * @param value The bytes for extra to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExtraBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        extra_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1162,10 +1458,11 @@ public final class GetCommonParamProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\034get_common_param_proto.proto\"\'\n\025GetCom" +
-      "monParamRequest\022\016\n\006voteId\030\001 \001(\005\"V\n\026GetCo" +
+      "monParamRequest\022\016\n\006voteId\030\001 \001(\005\"w\n\026GetCo" +
       "mmonParamResponse\022\022\n\nstatusCode\030\001 \001(\005\022\023\n" +
-      "\013generatorG1\030\002 \001(\014\022\023\n\013selectionId\030\003 \001(\014B" +
-      "\020\n\016com.test.protob\006proto3"
+      "\013generatorG1\030\002 \001(\014\022\023\n\013selectionId\030\003 \001(\014\022" +
+      "\020\n\010deadLine\030\004 \001(\t\022\r\n\005extra\030\005 \001(\tB\020\n\016com." +
+      "test.protob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1182,7 +1479,7 @@ public final class GetCommonParamProto {
     internal_static_GetCommonParamResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GetCommonParamResponse_descriptor,
-        new java.lang.String[] { "StatusCode", "GeneratorG1", "SelectionId", });
+        new java.lang.String[] { "StatusCode", "GeneratorG1", "SelectionId", "DeadLine", "Extra", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

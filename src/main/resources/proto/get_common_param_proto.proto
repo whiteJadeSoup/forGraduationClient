@@ -19,4 +19,6 @@ message GetCommonParamResponse {
 	 int32 statusCode = 1;
 	 bytes generatorG1 = 2;
 	 bytes selectionId = 3;
+	 string deadLine = 4;
+	 string extra = 5;
 }

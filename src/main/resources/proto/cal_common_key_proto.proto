@@ -20,4 +20,5 @@ message CalCommonKeyResponse {
 	 
 	 int32 statusCode = 2;
 	 bytes commonKey = 3;
+	 string extra = 4;
 }

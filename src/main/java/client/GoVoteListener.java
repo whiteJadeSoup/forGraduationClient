@@ -12,11 +12,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.test.proto.GetCommonParamProto;
 import com.test.proto.GoVoteProto;
 import com.test.proto.GoVoteProto.GoVoteRequest;
 import com.test.proto.GoVoteProto.GoVoteRequest.Builder;
+import com.test.proto.MsgInfo.MsgBody;
 
+import io.netty.channel.Channel;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
@@ -26,9 +29,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import util.ByteUtil;
 import util.CacheUtil;
+import util.MsgUtil;
 
 public class GoVoteListener implements ActionListener {
-	private JTextField voteId;
 	private JTextField voteBinary;
 	
 	
@@ -36,33 +39,35 @@ public class GoVoteListener implements ActionListener {
 	private static final String commonGyiFile = "commonGyiFile.data";
 	private static final String privateKeyFile = "sk.data";
 	private static final String generatorFile = "generatorG1.data";
-	public GoVoteListener(JTextField _voteId, JTextField _voteBinary) {
-		voteId = _voteId;
+	private Channel channel;
+	public static GoVoteListener instance = null;
+	
+	public static GoVoteListener getInstance() {
+		if (instance == null) {
+			instance =  new GoVoteListener();
+		}
+		
+		return instance;
+	}
+	
+	private GoVoteListener() {
+		
+	}
+	
+	public void setProperty(Channel f, JTextField _voteBinary) {
+		this.channel = f;
 		voteBinary = _voteBinary;
 	}
 	
 	
-	private void checkSymmetric(Pairing pairing) {
-		if (!pairing.isSymmetric()) {
-			throw new RuntimeException("密钥不对称!");
-		}
-	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		
 		//1 先得到参数
 		//1.1  投票者编号  1.2 私钥  1.3 投票决定
-		
-		// 编号是否为空
-		String id = voteId.getText();
-		if (id.trim().equalsIgnoreCase("")) {
-			//return
-			JOptionPane.showMessageDialog(null,"先输入id");
-			return;
-		}
-		int voteIdInteger = Integer.valueOf(id);
+		int voteIdInteger = CacheUtil.gVoteId;
 		
 		
 		// 投票决定是否为空
@@ -73,13 +78,11 @@ public class GoVoteListener implements ActionListener {
 			return;
 		}
 		int voteInteger = Integer.valueOf(vote);
-		
 		System.out.println(voteInteger);
 		if (voteInteger != 1 && voteInteger != 0) {
 			JOptionPane.showMessageDialog(null, "投票必须是1或者0!");
 			return;
 		}
-		
 		
 		
 		
@@ -135,20 +138,6 @@ public class GoVoteListener implements ActionListener {
 		};
 
 
-		
-	    // 生成元	
-		// 不需要了 公共参数里面有
-//		byte[] 	generatorBytes;
-//		try {
-//			generatorBytes = util.FileUtil.ReadFromFile(generatorFile);
-//		} catch (Exception e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//			return;
-//		};
-				
-		
-		
 		Element privateKey = CacheUtil.gPairing.getZr().newElementFromBytes(privateKeyBytes);
 		Element commonGyiKey = CacheUtil.gPairing.getG1().newElementFromBytes(commonGyiKeyBytes);
 		
@@ -157,21 +146,7 @@ public class GoVoteListener implements ActionListener {
 				" commonGyiKey: " + commonGyiKey + 
 				" genenator: " + CacheUtil.gGeneratorG1);
 		
-		
-		
-		
-		
-//		Element leftPart = pairing.getGT().newElement();
-//		leftPart = pairing.pairing(commonGyiKey, hash_G_2).powZn(privateKey);
-//		Element rightPart = pairing.getGT().newElement();
-//		rightPart = pairing.pairing(generatorKey, hash_G_2).pow(BigInteger.valueOf(voteInteger));
-//		
-//		
-//		Element result = leftPart.mul(rightPart);
-//		System.out.println("voteid: " + voteIdInteger + "result: " + result);
-		
-		
-		
+
 		
 		// 2.2 再生成一个零知识证明
 		//gid: e(g, hash)
@@ -198,58 +173,99 @@ public class GoVoteListener implements ActionListener {
 		
 		
 		//3 把投票信息  化为bytes 发送过去。
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			request.writeTo(out);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
-		}
+		this.channel.writeAndFlush(MsgUtil.build(6,  request.toByteArray()));
 		
 		
 		
-		
-		
-		OkHttpClient client = new OkHttpClient();
-		String url = "http://localhost:6889/goVote";
-		RequestBody body = RequestBody.create(out.toByteArray());
-	    Request httpRequest = new Request.Builder().url(url)
-	    		.post(body)
-	    		.build();
+//		ByteArrayOutputStream out = new ByteArrayOutputStream();
+//		try {
+//			request.writeTo(out);
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			return;
+//		}
+//		
+//		
+//		
+//		
+//		
+//		OkHttpClient client = new OkHttpClient();
+//		String url = "http://localhost:6889/goVote";
+//		RequestBody body = RequestBody.create(out.toByteArray());
+//	    Request httpRequest = new Request.Builder().url(url)
+//	    		.post(body)
+//	    		.build();
+//
+//	    
+//	    
+//	    //4 打印出结果。
+//	    Response response;
+//		try {
+//			response = client.newCall(httpRequest).execute();
+//			
+//			String ans = response.body().string();
+//			GoVoteProto.GoVoteResponse responseProto = 
+//					GoVoteProto.GoVoteResponse.parseFrom(ans.getBytes("iso-8859-1"));
+//			
+//			int statusCode = responseProto.getStatusCode();
+//			if (statusCode == 0) {
+//				JOptionPane.showMessageDialog(null,"投票成功");
+//				
+//			} else if (statusCode == 1){
+//				JOptionPane.showMessageDialog(null, "重复投票！ 请拉取最新选举状态!");
+//				
+//			} else {
+//				JOptionPane.showMessageDialog(null, responseProto.getExtra());
+//				
+//			}
+//			
+//			
+//			
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			return;
+//		}
 
-	    
-	    
-	    //4 打印出结果。
-	    Response response;
+	}
+	
+	
+	public static void afterGoVoteSuccess(MsgBody body) {
 		try {
-			response = client.newCall(httpRequest).execute();
+			//1 反序列化
+			GoVoteProto.GoVoteResponse response = GoVoteProto.GoVoteResponse.parseFrom(body.getContent().toByteArray());
 			
-			String ans = response.body().string();
-			GoVoteProto.GoVoteResponse responseProto = 
-					GoVoteProto.GoVoteResponse.parseFrom(ans.getBytes("iso-8859-1"));
 			
-			int statusCode = responseProto.getStatusCode();
+			//2 提示消息
+			int statusCode = response.getStatusCode();
 			if (statusCode == 0) {
-				JOptionPane.showMessageDialog(null,"投票成功");
+				JOptionPane.showMessageDialog(null,"投票成功!");
 				
 			} else if (statusCode == 1){
 				JOptionPane.showMessageDialog(null, "重复投票！ 请拉取最新选举状态!");
 				
 			} else {
-				JOptionPane.showMessageDialog(null, responseProto.getExtra());
-				
+				JOptionPane.showMessageDialog(null, "投票失败! " + response.getExtra());
+				 
 			}
 			
 			
 			
-		} catch (IOException e1) {
+			
+			
+			
+			
+			
+		} catch (InvalidProtocolBufferException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "GoVoteResponse 反序列化失败！");
 		}
-
+		
+		
 	}
+	
 	
 	
 	

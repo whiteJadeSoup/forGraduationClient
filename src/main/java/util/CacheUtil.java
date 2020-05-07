@@ -18,6 +18,8 @@ public class CacheUtil {
 	
 	public static Pairing gPairing = null;
 	
+	public static int gVoteId;
+	
 	
 	public static void init() throws Exception {
 		//0 初始化

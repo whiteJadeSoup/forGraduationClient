@@ -9,10 +9,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import io.netty.channel.Channel;
+import util.CacheUtil;
+
 public class AfterLoginFrame extends JFrame {
 	
-	public AfterLoginFrame() {
-		setTitle("登录后的用户界面");
+	private Channel thisChannel;
+	public AfterLoginFrame(Channel f) {
+		this.thisChannel = f;
+	}
+	
+	
+	public void ShowUI() {
+		setTitle("投票者编号: " + CacheUtil.gVoteId);
 		//setSize(340,500);//只对顶级容器有效
 		setDefaultCloseOperation(3);//窗体关闭时结束程序
 		setLocationRelativeTo(null);//居中
@@ -25,49 +34,59 @@ public class AfterLoginFrame extends JFrame {
 		
 		//第一个panel
 		JPanel mJPanel1 = new JPanel();
-		mJPanel1.setLayout(new FlowLayout());
+		mJPanel1.setLayout(new GridLayout(1, 4));
 		
 		//第一个panel的按钮
-		JButton getCommonParam = new JButton("获得公共参数");
-		mJPanel1.add(getCommonParam);
+		//显示选举
+		JLabel selectionIdTips = new JLabel("当前选举id: ");
+		JLabel selectionId = new JLabel();
+		selectionId.setBounds(60, 10, 50, 20);
 		
+		
+		JLabel deadLineTips = new JLabel("选举截止时间： ");
+		JLabel deadLine = new JLabel();
+		deadLine.setBounds(60, 10, 40, 20);
+		
+		
+		mJPanel1.add(selectionIdTips);
+		mJPanel1.add(selectionId);
+		mJPanel1.add(deadLineTips);
+		mJPanel1.add(deadLine);
 		getContentPane().add(mJPanel1);
-		getCommonParam.addActionListener(new GetCommonParamListener());
 		
 		
 		
-		//第二个panel
+		
+		
+		// 第二个panel
+		// 拉取公共参数 、 传播公钥、 公共公钥
 		JPanel mJPanel2 = new JPanel();
 		mJPanel2.setLayout(new FlowLayout());
 		
+		JButton getCommonParam = new JButton("获得公共参数");
 		JButton boradcastBtn = new JButton("公布公钥");
-		JLabel voterNumber = new JLabel("投票者id: ");
-		JTextField mNameTextField = new JTextField(20);
+		JButton calBtn = new JButton("计算公共公钥") ;
+		
+		mJPanel2.add(getCommonParam);
 		mJPanel2.add(boradcastBtn);
-		mJPanel2.add(voterNumber);
-		mJPanel2.add(mNameTextField);
-		
+		mJPanel2.add(calBtn);
 		getContentPane().add(mJPanel2);
-		boradcastBtn.addActionListener(new BoardCastPrivateKeyListener(mNameTextField));
 		
 		
-		JPanel mJPanel4 = new JPanel();
-		mJPanel4.setLayout(new FlowLayout());
+		// 3 拉取公共参数listener
+		GetCommonParamListener getCommonParamListener = GetCommonParamListener.getInstance();
+		getCommonParamListener.setProperty(this.thisChannel, selectionId, deadLine);
+		getCommonParam.addActionListener(getCommonParamListener);
 		
-		JButton calBtn = new JButton("计算g_{y_{i}}") ;
-		mJPanel4.add(calBtn);
+		// boardCastPrivateKeyListener 4
+		BoardCastPrivateKeyListener boardCastPrivateKeyListener = BoardCastPrivateKeyListener.getInstance();
+		boardCastPrivateKeyListener.setProperty(this.thisChannel);
+		boradcastBtn.addActionListener(boardCastPrivateKeyListener);
 		
-		
-		//@todo 去掉。 
-		JTextField voteID = new JTextField(10);
-		mJPanel4.add(voteID);
-		getContentPane().add(mJPanel4);
-		
-		calBtn.addActionListener(new CalCommonGyiListener(voteID));
-		
-		
-		
-		
+		// 5： CalCommonGyiListener
+		CalCommonGyiListener calCommonGyiListener = CalCommonGyiListener.getInstance();
+		calCommonGyiListener.setProperty(thisChannel);
+		calBtn.addActionListener(calCommonGyiListener);
 		
 		
 		
@@ -76,21 +95,22 @@ public class AfterLoginFrame extends JFrame {
 		mJPanel3.setLayout(new FlowLayout());
 		
 		JButton voteBtn = new JButton("投票");
-		JLabel voterNumber2 = new JLabel("投票者id: ");
-		JTextField mNameTextField2 = new JTextField(10);
-		mJPanel3.add(voteBtn);
-		mJPanel3.add(voterNumber2);
-		mJPanel3.add(mNameTextField2);
-		
-		
-		
 		JLabel voteDecision = new JLabel("投票决定: ");
 		JTextField decisionField = new JTextField(5);
+		
+		mJPanel3.add(voteBtn);
 		mJPanel3.add(voteDecision);
 		mJPanel3.add(decisionField);
 		getContentPane().add(mJPanel3);
 		
-		voteBtn.addActionListener(new GoVoteListener(mNameTextField2,  decisionField));
+		
+		//6 GoVoteListener
+		GoVoteListener goVoteListener = GoVoteListener.getInstance();
+		goVoteListener.setProperty(thisChannel, decisionField);
+		voteBtn.addActionListener(goVoteListener);
+		
+		
+		
 		
 		
 		JPanel mJPanel5 = new JPanel();
@@ -100,7 +120,11 @@ public class AfterLoginFrame extends JFrame {
 		mJPanel5.add(getVoteResultBtn);
 		getContentPane().add(mJPanel5);
 		
-		getVoteResultBtn.addActionListener(new GetVoteResultListener());
+		
+		
+		GetVoteResultListener getVoteResultListener = GetVoteResultListener.getInstance();
+		getVoteResultListener.setProperty(thisChannel);
+		getVoteResultBtn.addActionListener(getVoteResultListener);
 		
 		
 		this.pack();

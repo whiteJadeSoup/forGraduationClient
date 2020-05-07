@@ -1,0 +1,11 @@
+syntax = "proto3";
+option java_package = "com.test.proto";
+//option java_multiple_files = true;
+option java_outer_classname = "MsgInfo";
+
+
+message MsgBody {
+	int32 command = 1;
+	bytes content = 2;
+
+}

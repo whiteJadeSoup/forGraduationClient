@@ -15,8 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import org.msgpack.core.MessageBufferPacker;
-import org.msgpack.core.MessagePack;
 
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
@@ -28,38 +26,51 @@ import okhttp3.Response;
 import util.ByteUtil;
 import util.CacheUtil;
 import util.FileUtil;
+import util.MsgUtil;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.test.proto.PublicKeyProto;
+import com.test.proto.RegisterInfo;
+import com.test.proto.MsgInfo.MsgBody;
 import com.test.proto.PublicKeyProto.BoardcastPublicKeyRequest;
 import com.test.proto.PublicKeyProto.BoardcastPublicKeyRequest.Builder;
 import com.test.proto.PublicKeyProto.BoardcastPublicKeyResponse;
+
+import io.netty.channel.Channel;
 
 
 public class BoardCastPrivateKeyListener implements ActionListener {
 	private static final String privateKeyFile = "sk.data";
 	private static final String generatorFile = "generatorG1.data";
-	private JTextField voteId;
-	public BoardCastPrivateKeyListener(JTextField _voteId) {
-		voteId = _voteId;
+	
+	
+	
+	private Channel channel;
+	public static BoardCastPrivateKeyListener instance = null;
+	public static BoardCastPrivateKeyListener getInstance() {
+		if (instance == null) {
+			instance =  new BoardCastPrivateKeyListener();
+		}
+		
+		return instance;
+	}
+	
+	private BoardCastPrivateKeyListener() {
+		
+	}
+	
+	public void setProperty(Channel f) {
+		this.channel = f;
 	}
 	
 	
+	
+	
+	
+	
 	public void actionPerformed(ActionEvent e) {
-		
-		//1 投票者id是否写了?
-		//@todo 是否是数字
-		String id = voteId.getText();
-		if (id.trim().equalsIgnoreCase("")) {
-			//return
-			JOptionPane.showMessageDialog(null, "先输入id");
-			return;
-		}
-		
-		
-		
-		//是否已经拉取公共参数了？
+		//1 是否已经拉取公共参数了？
 		if (CacheUtil.gGeneratorG1 == null || CacheUtil.gSelectionId == "") {
 			JOptionPane.showMessageDialog(null, "请先拉取公共参数!");
 			return;
@@ -121,24 +132,12 @@ public class BoardCastPrivateKeyListener implements ActionListener {
 
 		
 		
-		// 4 生成公钥
+		// 3 生成公钥
 		// 先读出公约
 		// 不需要了 先去拉取公共参数。
-//		FileInputStream in;
-//		byte[] generator;
-//		
-//		
-//		try {
-//			generator = FileUtil.ReadFromFile(generatorFile);
-//		} catch (Exception e3) {
-//			// TODO Auto-generated catch block
-//			e3.printStackTrace();
-//			return;
-//		}
-//		Element generatorG1 = pairing.getG1().newElementFromBytes(generator);
 		Element publicKeyElement = CacheUtil.gGeneratorG1.getImmutable().powZn(privateKey);
 		
-		System.out.println("voteid: " + Integer.valueOf(id) + 
+		System.out.println("voteid: " + CacheUtil.gVoteId + 
 				" sk: " + privateKey + 
 				" generator: " + CacheUtil.gGeneratorG1 + 
 				" pk: " + publicKeyElement);
@@ -146,7 +145,7 @@ public class BoardCastPrivateKeyListener implements ActionListener {
 		
 	
 		
-		//生成一个对私钥的的零知识证明。
+		// 4 生成一个对私钥的的零知识证明。
 		//g^{q}, r
 		
 		// 先生成gq;
@@ -155,7 +154,7 @@ public class BoardCastPrivateKeyListener implements ActionListener {
 		
 		// 再生成 r = q - x_{i} z
 		//z = hash(g, gq, gxi, i)
-		int voteIdInt = Integer.valueOf(id.trim());
+		int voteIdInt = CacheUtil.gVoteId;
 		
 		
 		
@@ -186,25 +185,7 @@ public class BoardCastPrivateKeyListener implements ActionListener {
 	    //pass test!
 	    //Element r2 = pairing.getZr().newRandomElement();
 		
-	    
-	    
-	    
-	    //先自己验证一下试试。 
-	    //gq ==?  gr gxi z
-	    //验证通过。
-	    //todo 删掉。
-//	    Element gr = generatorG1.getImmutable().powZn(r);
-//	    //Element gxiz = generatorG1.getImmutable().powZn(privateKey.getImmutable().mul(zZrElement));
-//	    Element gxiz = publicKeyElement.getImmutable().powZn(zZrElement);
-//	    Element newRightPart = gr.getImmutable().mul(gxiz);
-//
-//	    
-//	    if (gq.isEqual(newRightPart)) {
-//	    	System.out.println("pass!");
-//	    } else {
-//	    	System.out.println("error!");
-//	    }
-//	    
+
 
 		
 		
@@ -221,60 +202,112 @@ public class BoardCastPrivateKeyListener implements ActionListener {
 		
 		
 		
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			publicKeyRequest.writeTo(out);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		this.channel.writeAndFlush(MsgUtil.build(4, publicKeyRequest.toByteArray()));
 		
+		
+		
+//		ByteArrayOutputStream out = new ByteArrayOutputStream();
+//		try {
+//			publicKeyRequest.writeTo(out);
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
+//	
+//		
+//
+//		OkHttpClient client = new OkHttpClient();
+//		String url = "http://localhost:6889/boardcastPrivateKey";
+//		RequestBody body = RequestBody.create(out.toByteArray());
+//	    Request request = new Request.Builder().url(url)
+//	    		.post(body)
+//	    		.build();
+
+	    
+	    
+//	    //6 打印出结果。
+//	    Response response;
+//		try {
+//			response = client.newCall(request).execute();
+//			
+//			String ans =  response.body().string();
+//			PublicKeyProto.BoardcastPublicKeyResponse responseProto = 
+//					BoardcastPublicKeyResponse.parseFrom(ans.getBytes("iso-8859-1"));
+//			
+//			
+//			if (responseProto.getStatusCode() == 0) {
+//				JOptionPane.showMessageDialog(null, "公布公钥成功!");
+//				
+//			} else if (responseProto.getStatusCode() == 1){
+//				JOptionPane.showMessageDialog(null, "已经公开过公钥了!");
+//				
+//			} else if (responseProto.getStatusCode() == 3) {
+//				JOptionPane.showMessageDialog(null, "零知识证明无法通过!");
+//				
+//			} else {
+//				JOptionPane.showMessageDialog(null, "未知错误!");
+//				
+//			}
+//			
+//			
+//			
+//			
+//			
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			return;
+//		}
+		
+		
+	}
 	
-		
-
-		OkHttpClient client = new OkHttpClient();
-		String url = "http://localhost:6889/boardcastPrivateKey";
-		RequestBody body = RequestBody.create(out.toByteArray());
-	    Request request = new Request.Builder().url(url)
-	    		.post(body)
-	    		.build();
-
-	    
-	    
-	    //6 打印出结果。
-	    Response response;
+	
+	
+	
+	public static void afterBoardCastSuccess(MsgBody msg) {
+		//1 先反序列化
+		PublicKeyProto.BoardcastPublicKeyResponse response;
 		try {
-			response = client.newCall(request).execute();
-			
-			String ans =  response.body().string();
-			PublicKeyProto.BoardcastPublicKeyResponse responseProto = 
-					BoardcastPublicKeyResponse.parseFrom(ans.getBytes("iso-8859-1"));
-			
-			
-			if (responseProto.getStatusCode() == 0) {
-				JOptionPane.showMessageDialog(null, "公布公钥成功!");
-				
-			} else if (responseProto.getStatusCode() == 1){
-				JOptionPane.showMessageDialog(null, "已经公开过公钥了!");
-				
-			} else if (responseProto.getStatusCode() == 3) {
-				JOptionPane.showMessageDialog(null, "零知识证明无法通过!");
-				
-			} else {
-				JOptionPane.showMessageDialog(null, "未知错误!");
-				
-			}
-			
-			
-			
-			
-			
-		} catch (IOException e1) {
+			response = PublicKeyProto.BoardcastPublicKeyResponse.parseFrom(msg.getContent().toByteArray());
+		} catch (InvalidProtocolBufferException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "反序列化失败! 异常!");
 			return;
 		}
 		
+		
+		
+		
+		//2 提示消息
+		if (response.getStatusCode() == 0) {
+			JOptionPane.showMessageDialog(null, "公布公钥成功!");
+			
+		} else if (response.getStatusCode() == 1){
+			JOptionPane.showMessageDialog(null, "已经公开过公钥了!");
+			
+		} else if (response.getStatusCode() == 3) {
+			JOptionPane.showMessageDialog(null, "零知识证明无法通过!");
+			
+		} else {
+			JOptionPane.showMessageDialog(null, "未知错误!");
+			
+		}
+		
+		
+		
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }

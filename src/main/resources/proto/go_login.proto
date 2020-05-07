@@ -1,0 +1,22 @@
+syntax = "proto3";
+option java_package = "com.test.proto";
+//option java_multiple_files = true;
+option java_outer_classname = "LoginInfo";
+
+
+message LoginRequest {
+    int32 voteId = 1;
+    string password = 2;
+}
+
+
+
+// statusCode: 0 - 正常  
+// extra: 错误信息
+message LoginResponse {
+    int32 statusCode = 1;
+    string extra = 2;
+    
+    int32 voteId = 3;
+
+}

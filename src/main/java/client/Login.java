@@ -6,21 +6,38 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import io.netty.channel.Channel;
 import util.CacheUtil;
 
 public class Login {
 	
+	private Channel thisChannel;
+	
+	
+	
 	public static void main(String args[]) throws Exception {
-		Login l=new Login();
-		
 		//初始化
 		CacheUtil.init();
+		new NettyClient().doConnect("127.0.0.1", 6889);
 		
 		
-		l.showUI();
 	}
 	
+	
+	
+	public Login() {
+		
+	}
+	
+	public Login(Channel channel) {
+		this.thisChannel = channel;
+	}
+	
+	
+	
+	
 	public void showUI() {
+
 		javax.swing.JFrame jf = new javax.swing.JFrame();
 		//@todo: 改成中文
 		jf.setTitle("Login");
@@ -93,13 +110,17 @@ public class Login {
 		
 		
 		//登录按钮这个需要注册监听事件
-		LoginListener ll = new LoginListener(jf, textname, jp);
+		LoginListener ll = LoginListener.getInstance();
+		ll.setProperty(thisChannel, jf, textname, jp);
+		
+		//LoginListener ll = new LoginListener(thisChannel, jf, textname, jp);
 		loginButton.addActionListener(ll);
 		
 		
 		//对注册也是
-		
-		
+		RegisterListener registerListener = RegisterListener.getInstance();
+		registerListener.setProperty(thisChannel, jp);
+		registerButton.addActionListener(registerListener);
 		
 		
 		
